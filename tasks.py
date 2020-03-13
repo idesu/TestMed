@@ -25,15 +25,16 @@ def generate_reports():
     os.chdir('tasks')
     for user in users:
         completed_tasks = [
-            x["title"]
-            for x in tasks
-            if x["userId"] == user["id"] and x["completed"]
+            task["title"]
+            for task in tasks
+            if task["userId"] == user["id"] and task["completed"]
         ]
+        task_title_max_length = 50
         uncompleted_tasks = [
-            x["title"] if len(x["title"]) < 50
-            else x["title"][:50]+'...'
-            for x in tasks
-            if x["userId"] == user["id"] and not x["completed"]
+            task["title"] if len(task["title"]) < task_title_max_length
+            else task["title"][:task_title_max_length]+'...'
+            for task in tasks
+            if task["userId"] == user["id"] and not task["completed"]
         ]
 
         if os.path.isfile(f'{user["username"]}.txt'):
@@ -57,7 +58,8 @@ def generate_reports():
 {newline.join(uncompleted_tasks)}"""
                 )
         except IOError:
-            os.rename(f'{user["username"]}_{formatted_time}.txt', f'{user["username"]}.txt'
+            os.rename(f'{user["username"]}_{formatted_time}.txt',
+                      f'{user["username"]}.txt'
                       )
             print("An IOError has occurred!")
 
