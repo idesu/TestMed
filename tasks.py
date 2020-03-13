@@ -37,6 +37,9 @@ def generate_reports():
             if task["userId"] == user["id"] and not task["completed"]
         ]
 
+        if len(uncompleted_tasks) and len(completed_tasks) == 0:
+            continue
+
         if os.path.isfile(f'{user["username"]}.txt'):
             creation_time = os.path.getctime(f'{user["username"]}.txt')
             formatted_time = dt.datetime.fromtimestamp(
