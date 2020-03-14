@@ -1,22 +1,24 @@
 import datetime as dt
 import json
 import os
+import ssl
 import urllib.request
 
 
 todos_url = "https://json.medrating.org/todos"
 users_url = "https://json.medrating.org/users"
-
-time_now = dt.datetime.now().strftime("%d.%m.%Y %H:%M")
-
-with urllib.request.urlopen(users_url) as url:
-    users = json.loads(url.read().decode())
-
-with urllib.request.urlopen(todos_url) as url:
-    tasks = json.loads(url.read().decode())
-
+#Certificate verify hack
+context = ssl._create_unverified_context()
 
 def generate_reports():
+    time_now = dt.datetime.now().strftime("%d.%m.%Y %H:%M")
+
+    with urllib.request.urlopen(users_url, context=context) as url:
+        users = json.loads(url.read().decode())
+
+    with urllib.request.urlopen(todos_url, context=context) as url:
+        tasks = json.loads(url.read().decode())
+
     try:
         os.makedirs('tasks', exist_ok=True)
     except:
