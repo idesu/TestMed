@@ -4,14 +4,14 @@ import os
 import ssl
 import urllib.request
 
-
 todos_url = "https://json.medrating.org/todos"
 users_url = "https://json.medrating.org/users"
 # Certificate verify hack for MacOS with embedded version of OpenSSL,
-# which does not use the system certificate store by default 
-# This is the Right Way: 
+# which does not use the system certificate store by default
+# This is the Way:
 # /Applications/Python\ 3.7/Install Certificates.command
 context = ssl._create_unverified_context()
+
 
 def generate_reports():
     time_now = dt.datetime.now().strftime("%d.%m.%Y %H:%M")
@@ -22,12 +22,9 @@ def generate_reports():
     with urllib.request.urlopen(todos_url, context=context) as url:
         tasks = json.loads(url.read().decode())
 
-    try:
-        os.makedirs('tasks', exist_ok=True)
-    except:
-        raise OSError("Can't create destination directory tasks!")
-
+    os.makedirs('tasks', exist_ok=True)
     os.chdir('tasks')
+
     for user in users:
         completed_tasks = [
             task["title"]
@@ -45,15 +42,16 @@ def generate_reports():
         if len(uncompleted_tasks) and len(completed_tasks) == 0:
             continue
 
-        if os.path.isfile(f'{user["username"]}.txt'):
-            creation_time = os.path.getctime(f'{user["username"]}.txt')
-            formatted_time = dt.datetime.fromtimestamp(
-                creation_time).strftime('%Y-%m-%dT%H:%M')
-            os.rename(f'{user["username"]}.txt',
-                      f'{user["username"]}_{formatted_time}.txt')
+        username = user["username"]
 
+        if os.path.isfile(f'{username}.txt'):
+            creation_time = os.path.getctime(f'{username}.txt')
+            formatted_ctime = dt.datetime.fromtimestamp(
+                creation_time).strftime('%Y-%m-%dT%H:%M')
+            os.rename(f'{username}.txt',
+                      f'{username}_{formatted_ctime}.txt')
         try:
-            with open(f'{user["username"]}.txt', 'w') as f:
+            with open(f'{username}.txt', 'w') as f:
                 newline = '\n'
                 f.write(
                     f"""{user["name"]} <{user["email"]}> {time_now}
@@ -65,11 +63,19 @@ def generate_reports():
 Оставшиеся задачи:
 {newline.join(uncompleted_tasks)}"""
                 )
-        except IOError:
-            os.rename(f'{user["username"]}_{formatted_time}.txt',
-                      f'{user["username"]}.txt'
-                      )
-            print("An IOError has occurred!")
+        except:
+            try:
+                os.remove(f'{username}.txt')
+                print(
+                    f'Cant write to {username}.txt new file removed successfully')
+            except OSError as e:
+                if e.errno == ENOENT:
+                    # suppress "FileNotFoundError"
+                    pass
+                else:
+                    raise
+            os.rename(f'{username}_{formatted_ctime}.txt',
+                      f'{username}.txt')
 
 
 if __name__ == '__main__':
