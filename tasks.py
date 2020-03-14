@@ -7,7 +7,10 @@ import urllib.request
 
 todos_url = "https://json.medrating.org/todos"
 users_url = "https://json.medrating.org/users"
-#Certificate verify hack
+# Certificate verify hack for MacOS with embedded version of OpenSSL,
+# which does not use the system certificate store by default 
+# This is the Right Way: 
+# /Applications/Python\ 3.7/Install Certificates.command
 context = ssl._create_unverified_context()
 
 def generate_reports():
