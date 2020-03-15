@@ -40,15 +40,15 @@ def format_report(user, user_completed, user_uncompleted):
     now_time = dt.datetime.now().strftime("%d.%m.%Y %H:%M")
     newline = '\n'
 
-    return (f"""{user["name"]} <{user["email"]}> {now_time}
-{user["company"]["name"]}
-
-Завершённые задачи:
-{newline.join(user_completed)}
-
-Оставшиеся задачи:
-{newline.join(user_uncompleted)}
-""")
+    return (f"{user['name']} <{user['email']}> {now_time}\n"
+            f"{user['company']['name']}\n"
+            f"\n"
+            f"Завершённые задачи:\n"
+            f"{newline.join(user_completed)}\n"
+            f"\n"
+            f"Оставшиеся задачи:\n"
+            f"{newline.join(user_uncompleted)}\n"
+    )
 
 
 def save_report_to_file(user, user_completed, user_uncompleted):
