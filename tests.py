@@ -23,36 +23,6 @@ class TestMedrating(unittest.TestCase):
             self.uncompleted_all.get(self.user_id, [])
             )
 
-    def test_get_json(self):
-        self.assertRaises(
-            json.decoder.JSONDecodeError,
-            tasks.get_data,
-            tasks.API_BASE
-            )
-
-        self.assertRaises(
-            requests.exceptions.HTTPError,
-            tasks.get_data,
-            "http://example.com/api/123"
-            )
-
-        self.assertRaises(
-            requests.exceptions.ConnectionError,
-            tasks.get_data,
-            f"http://invalid-url-test/wrong_page"
-            )
-
-        self.assertIsInstance(self.users_json, list)
-        self.assertIsInstance(self.users_json[0], dict)
-
-    def test_report_all_users(self):
-        sample_task = self.task['title']
-
-        self.assertTrue(
-            (sample_task in self.completed_user_tasks) ^
-            (sample_task in self.uncompleted_user_tasks)
-            )
-
     def test_formatting(self):
         output = tasks.format_report(
             self.user,
