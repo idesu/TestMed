@@ -77,6 +77,7 @@ class TestMedrating(unittest.TestCase):
             )
 
     def test_save_to_file(self):
+        tasks.OUT_DIR = 'invalid/'
         self.assertIsNone(tasks.save_report_to_file(self.user, [], []))
         self.assertRaises(
             FileNotFoundError,
@@ -85,6 +86,7 @@ class TestMedrating(unittest.TestCase):
             self.completed_user_tasks,
             self.uncompleted_user_tasks
             )
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -48,7 +48,7 @@ def format_report(user, user_completed, user_uncompleted):
             f"\n"
             f"Оставшиеся задачи:\n"
             f"{newline.join(user_uncompleted)}\n"
-    )
+            )
 
 
 def save_report_to_file(user, user_completed, user_uncompleted):
@@ -60,7 +60,7 @@ def save_report_to_file(user, user_completed, user_uncompleted):
     try:
         with open(report_name, "r") as f:
             prev_date = f.readline().rstrip().rsplit(None, 2)[-2:]
-    except (OSError, IOError) as e:
+    except (OSError, IOError):
         prev_date = None
 
     with open(f"{report_name}.new", "w") as f:
@@ -112,7 +112,7 @@ def main():
 
     try:
         os.makedirs(OUT_DIR, exist_ok=True)
-    except:
+    except OSError:
         raise OSError("Can't create destination directory tasks!")
 
     full_report(users, all_completed_tasks, all_uncompleted_tasks)
