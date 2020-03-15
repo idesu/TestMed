@@ -1,7 +1,6 @@
-import json
-import os
-import unittest
 import datetime as dt
+import json
+import unittest
 
 import requests
 
