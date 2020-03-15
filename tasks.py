@@ -9,6 +9,9 @@ API_USERS = f"{API_BASE}/users"
 API_TODOS = f"{API_BASE}/todos"
 MAX_TASK_TITLE_LEN = 50
 OUT_DIR = 'tasks'
+# If setted to True get creation time from actual file metadata
+# If False datetime will be recieved directly from report text
+TIME_FROM_CTIME = True
 
 
 def get_data(url):
@@ -51,21 +54,34 @@ def format_report(user, user_completed, user_uncompleted):
             )
 
 
-def save_report_to_file(user, user_completed, user_uncompleted):
-    report_name = f"{OUT_DIR}/{user['username']}.txt"
-
+def get_ctime_from_old_report(user):
     try:
-        with open(report_name, "r") as f:
+        with open(f"{OUT_DIR}/{user['username']}.txt", "r") as f:
             prev_date = f.readline().rstrip().rsplit(None, 2)[-2:]
+            return ' '.join(prev_date)
     except (OSError, IOError):
-        prev_date = None
+        return None
+
+
+def get_ctime_from_file(user):
+    try:
+        creation_time = os.path.getctime(f"{OUT_DIR}/{user['username']}.txt")
+        formatted_ctime = dt.datetime.fromtimestamp(
+            creation_time).strftime('%d.%m.%Y %H:%M')
+        return formatted_ctime
+    except (OSError, IOError):
+        return None
+
+
+def save_report_to_file(user, user_completed, user_uncompleted, prev_date):
+    report_name = f"{OUT_DIR}/{user['username']}.txt"
 
     with open(f"{report_name}.new", "w") as f:
         f.write(format_report(user, user_completed, user_uncompleted))
 
     if prev_date:
         date_fname = dt.datetime.strptime(
-            ' '.join(prev_date),
+            prev_date,
             "%d.%m.%Y %H:%M"
         ).strftime("%Y-%m-%dT%H:%M")
         os.rename(
@@ -80,7 +96,9 @@ def full_report(users, all_completed_tasks, all_uncompleted_tasks):
         save_report_to_file(
             user,
             all_completed_tasks.get(user['id'], []),
-            all_uncompleted_tasks.get(user['id'], [])
+            all_uncompleted_tasks.get(user['id'], []),
+            (get_ctime_from_file(user) if TIME_FROM_CTIME
+                else get_ctime_from_old_report(user))
         )
 
     all_ids = set([user['id'] for user in users])
