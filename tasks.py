@@ -1,6 +1,5 @@
 import datetime as dt
 import os
-import ssl
 from collections import defaultdict
 
 import requests
@@ -101,7 +100,7 @@ def full_report(users, all_completed_tasks, all_uncompleted_tasks):
     print("User ids from task with no user description: ")
     print(", ".join(list(
         completed_ids.union(uncompleted_ids).difference(all_ids)
-        )))
+    )))
 
 
 def main():
@@ -109,7 +108,7 @@ def main():
     todos = get_data(API_TODOS)
     all_completed_tasks, all_uncompleted_tasks = (
         make_report_for_all_users(todos)
-        )
+    )
 
     try:
         os.makedirs(OUT_DIR, exist_ok=True)
