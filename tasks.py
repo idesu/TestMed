@@ -52,9 +52,6 @@ def format_report(user, user_completed, user_uncompleted):
 
 
 def save_report_to_file(user, user_completed, user_uncompleted):
-    if not user_completed and not user_uncompleted:
-        return
-
     report_name = f"{OUT_DIR}/{user['username']}.txt"
 
     try:
