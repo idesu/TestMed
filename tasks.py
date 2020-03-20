@@ -33,13 +33,14 @@ def make_report_for_all_users(todos):
 
 
 def format_report(user, user_completed, user_uncompleted):
-    def format_title(title):
-        if len(title) <= MAX_TASK_TITLE_LEN:
-            return title
-        return title[:MAX_TASK_TITLE_LEN] + '...'
+    format_title = (
+        lambda title: title
+        if len(title) <= MAX_TASK_TITLE_LEN
+        else title[:MAX_TASK_TITLE_LEN] + '...'
+        )
 
-    user_completed = [format_title(title) for title in user_completed]
-    user_uncompleted = [format_title(title) for title in user_uncompleted]
+    user_completed = map(format_title, user_completed)
+    user_uncompleted = map(format_title, user_uncompleted)
     now_time = dt.datetime.now().strftime("%d.%m.%Y %H:%M")
     newline = '\n'
 
@@ -59,11 +60,11 @@ if TIME_FROM_CTIME:
         try:
             creation_time = os.path.getctime(
                 f"{OUT_DIR}/{user['username']}.txt"
-                )
+            )
             formatted_ctime = dt.datetime.fromtimestamp(
                 creation_time).strftime('%d.%m.%Y %H:%M')
             return formatted_ctime
-        except (OSError, IOError):
+        except (OSError):
             return None
 else:
     def get_ctime(user):
