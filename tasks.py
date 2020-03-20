@@ -54,23 +54,25 @@ def format_report(user, user_completed, user_uncompleted):
             )
 
 
-def get_ctime_from_old_report(user):
-    try:
-        with open(f"{OUT_DIR}/{user['username']}.txt", "r") as f:
-            prev_date = f.readline().rstrip().rsplit(None, 2)[-2:]
-            return ' '.join(prev_date)
-    except (OSError, IOError):
-        return None
-
-
-def get_ctime_from_file(user):
-    try:
-        creation_time = os.path.getctime(f"{OUT_DIR}/{user['username']}.txt")
-        formatted_ctime = dt.datetime.fromtimestamp(
-            creation_time).strftime('%d.%m.%Y %H:%M')
-        return formatted_ctime
-    except (OSError, IOError):
-        return None
+if TIME_FROM_CTIME:
+    def get_ctime(user):
+        try:
+            creation_time = os.path.getctime(
+                f"{OUT_DIR}/{user['username']}.txt"
+                )
+            formatted_ctime = dt.datetime.fromtimestamp(
+                creation_time).strftime('%d.%m.%Y %H:%M')
+            return formatted_ctime
+        except (OSError, IOError):
+            return None
+else:
+    def get_ctime(user):
+        try:
+            with open(f"{OUT_DIR}/{user['username']}.txt", "r") as f:
+                prev_date = f.readline().rstrip().rsplit(None, 2)[-2:]
+                return ' '.join(prev_date)
+        except (OSError, IOError):
+            return None
 
 
 def save_report_to_file(user, user_completed, user_uncompleted, prev_date):
@@ -97,8 +99,7 @@ def full_report(users, all_completed_tasks, all_uncompleted_tasks):
             user,
             all_completed_tasks.get(user['id'], []),
             all_uncompleted_tasks.get(user['id'], []),
-            (get_ctime_from_file(user) if TIME_FROM_CTIME
-                else get_ctime_from_old_report(user))
+            get_ctime(user)
         )
 
     all_ids = set([user['id'] for user in users])
